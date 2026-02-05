@@ -190,7 +190,7 @@ const App: React.FC = () => {
                     </p>
                     <div className="bg-slate-100 p-4 rounded text-xs font-mono text-left mb-6">
                         1. Go to your Hosting Provider (Vercel)<br/>
-                        2. Go to Project Settings -> Environment Variables<br/>
+                        2. Go to Project Settings &rarr; Environment Variables<br/>
                         3. Add <b>VITE_SUPABASE_URL</b><br/>
                         4. Add <b>VITE_SUPABASE_ANON_KEY</b>
                     </div>
