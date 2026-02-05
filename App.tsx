@@ -2470,12 +2470,11 @@ const users: User[] = currentUser ? [currentUser] : [];
                 users={users}
             />;
         }
-        return <RegisterPage
-            onRegisterSuccess={() => setAuthView('login')}
-            onNavigateToLogin={() => setAuthView('login')}
-            users={users}
-            setUsers={setUsers}
-        />;
+       return <RegisterPage
+  onRegisterSuccess={() => setAuthView('login')}
+  onNavigateToLogin={() => setAuthView('login')}
+/>;
+
     }
 
     if (currentUser.subscriptionStatus === 'needs_selection') {
