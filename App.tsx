@@ -2103,15 +2103,6 @@ const MainApp: React.FC<{
                     setPackages={setSubscriptionPackages}
                     users={users}
                 />;
-            case 'user-management':
-                return <UserManagementPage
-                    users={users}
-                    setUsers={setUsers}
-                    currentUser={currentUser}
-                    subscriptionPackages={subscriptionPackages}
-                    onOpenBulkEmail={() => setBulkEmailModalOpen(true)}
-                    onOpenUserEmail={handleOpenUserEmailModal}
-                />;
             case 'reports':
                 return <ReportsPage 
                     customers={customers}
