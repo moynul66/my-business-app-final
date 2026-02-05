@@ -1,56 +1,120 @@
 import React, { useState } from 'react';
-import { supabase } from '../services/supabaseClient';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
+import { User } from '../types';
 
-const LoginPage: React.FC<any> = () => {
-    const [email, setEmail] = useState('');
+interface LoginPageProps {
+    onLogin: (user: User) => void;
+    onNavigateToRegister: () => void;
+    users: User[];
+}
+
+const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onNavigateToRegister, users }) => {
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [isRegistering, setIsRegistering] = useState(false);
     const [error, setError] = useState('');
 
-    const handleAuth = async (e: React.FormEvent) => {
+    const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
-        setError('');
-
-        if (isRegistering) {
-            const { error } = await supabase.auth.signUp({ email, password });
-            if (error) setError(error.message);
-            else alert("Registration successful! Please check your email to verify your account.");
+        const user = users.find(u => u.username === username && u.password === password);
+        
+        if (user) {
+            if (user.isActive === false) {
+                setError('Your account has been deactivated. Please contact an administrator.');
+                return;
+            }
+            setError('');
+            onLogin(user);
         } else {
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) setError(error.message);
+            setError('Invalid username or password.');
         }
-        setLoading(false);
+    };
+
+    const handleForgotPassword = () => {
+        alert("For account recovery, please contact the master administrator.");
     };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-slate-100">
-            <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md border-t-4 border-blue-600">
+            <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
                 <div className="text-center">
-                    <h1 className="text-3xl font-bold text-slate-900">InQuBu Pro Cloud</h1>
-                    <p className="mt-2 text-sm text-slate-500">Access your business from anywhere</p>
+                    <h1 className="text-3xl font-bold text-slate-900">
+                        InQuBu Pro
+                    </h1>
+                    <p className="mt-2 text-sm text-slate-500">Inventory & Quoting, Built for You</p>
                 </div>
-                <form onSubmit={handleAuth} className="space-y-4">
+                <form onSubmit={handleLogin} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700">Email Address</label>
-                        <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+                        <label
+                            htmlFor="username"
+                            className="block text-sm font-medium text-slate-700"
+                        >
+                            Username
+                        </label>
+                        <Input
+                            id="username"
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                            className="mt-1"
+                            autoComplete="username"
+                        />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700">Password</label>
-                        <Input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+                        <label
+                            htmlFor="password"
+                            className="block text-sm font-medium text-slate-700"
+                        >
+                            Password
+                        </label>
+                        <Input
+                            id="password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            className="mt-1"
+                            autoComplete="current-password"
+                        />
                     </div>
-                    {error && <p className="text-sm text-red-600 text-center bg-red-50 p-2 rounded">{error}</p>}
-                    <Button type="submit" className="w-full" disabled={loading}>
-                        {loading ? 'Processing...' : (isRegistering ? 'Create Account' : 'Sign In')}
-                    </Button>
+
+                    <div className="flex items-center justify-end">
+                        <div className="text-sm">
+                            <button
+                                type="button"
+                                onClick={handleForgotPassword}
+                                className="font-medium text-blue-600 hover:text-blue-500 focus:outline-none focus:underline"
+                            >
+                                Forgot Username/Password?
+                            </button>
+                        </div>
+                    </div>
+
+                    {error && (
+                        <p className="text-sm text-red-600 text-center">{error}</p>
+                    )}
+                    <div>
+                        <Button
+                            type="submit"
+                            variant="primary"
+                            className="w-full"
+                        >
+                            Login
+                        </Button>
+                    </div>
                 </form>
                 <div className="text-center text-sm">
-                    <button onClick={() => setIsRegistering(!isRegistering)} className="text-blue-600 hover:underline">
-                        {isRegistering ? 'Already have an account? Login' : 'Need cloud storage? Register'}
-                    </button>
+                    <p className="text-slate-600">
+                        Don't have an account?{' '}
+                        <button
+                            type="button"
+                            onClick={onNavigateToRegister}
+                            className="font-medium text-blue-600 hover:text-blue-500 focus:outline-none focus:underline"
+                        >
+                            Register here
+                        </button>
+                    </p>
                 </div>
             </div>
         </div>
