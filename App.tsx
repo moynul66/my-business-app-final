@@ -2407,7 +2407,7 @@ const users: User[] = currentUser ? [currentUser] : [];
                 isActive: true,
             };
             const existingUsers = users.filter(u => u.role !== 'admin');
-            setUsers([masterAdmin, ...existingUsers]);
+            // setUsers([masterAdmin, ...existingUsers]);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

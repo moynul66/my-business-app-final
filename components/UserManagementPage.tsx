@@ -28,7 +28,7 @@ const UserManagementPage: React.FC<UserManagementPageProps> = ({ users, setUsers
     const [extensionDays, setExtensionDays] = useState(7);
 
     const updateUser = (userId: string, updates: Partial<User>) => {
-        setUsers(prev => prev.map(u => u.id === userId ? { ...u, ...updates } : u));
+        // setUsers(prev => prev.map(u => u.id === userId ? { ...u, ...updates } : u));
     };
     
     const handleDeleteUser = (userIdToDelete: string) => {
@@ -51,14 +51,14 @@ const UserManagementPage: React.FC<UserManagementPageProps> = ({ users, setUsers
             keysToRemove.forEach(key => localStorage.removeItem(key));
             
             // Remove the master user and all their team members
-            setUsers(prevUsers => prevUsers.filter(user => user.id !== userIdToDelete && user.teamId !== userIdToDelete));
+            // setUsers(prevUsers => prevUsers.filter(user => user.id !== userIdToDelete && user.teamId !== userIdToDelete));
             alert(`User "${userToDelete.username}" and all their data have been deleted.`);
 
         } else if (currentUser.role === 'master') {
             if (!window.confirm(`Are you sure you want to delete the user "${userToDelete.username}"? This action cannot be undone.`)) {
                 return;
             }
-            setUsers(prevUsers => prevUsers.filter(user => user.id !== userIdToDelete));
+            // setUsers(prevUsers => prevUsers.filter(user => user.id !== userIdToDelete));
             alert(`User "${userToDelete.username}" has been deleted.`);
         }
     };
@@ -84,9 +84,9 @@ const UserManagementPage: React.FC<UserManagementPageProps> = ({ users, setUsers
         }
 
         if (editingUser) { // Update
-            setUsers(prev => prev.map(u => u.id === userData.id ? userData : u));
+            // setUsers(prev => prev.map(u => u.id === userData.id ? userData : u));
         } else { // Create
-            setUsers(prev => [...prev, userData]);
+            // setUsers(prev => [...prev, userData]);
         }
         setIsFormModalOpen(false);
         setEditingUser(null);

@@ -49,7 +49,7 @@ const SubscriptionManager: React.FC<SubscriptionManagerProps> = ({ currentUser, 
             };
 
             setCurrentUser(updatedUser);
-            setUsers(prevUsers =>
+            // setUsers(prevUsers =>
                 prevUsers.map(user =>
                     user.id === currentUser.id ? updatedUser : user
                 )

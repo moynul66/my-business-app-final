@@ -54,7 +54,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onRegisterSuccess, onNaviga
             isActive: true,
         };
 
-        setUsers(prevUsers => [...prevUsers, newUser]);
+        // setUsers(prevUsers => [...prevUsers, newUser]);
         alert('Registration successful! Please log in to choose your plan and start your free trial.');
         onRegisterSuccess();
     };

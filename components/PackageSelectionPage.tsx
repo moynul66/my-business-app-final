@@ -32,7 +32,7 @@ const PackageSelectionPage: React.FC<PackageSelectionPageProps> = ({ currentUser
             };
 
             const updatedUsers = users.map(u => u.id === currentUser.id ? updatedUser : u);
-            setUsers(updatedUsers);
+            // setUsers(updatedUsers);
             setCurrentUser(updatedUser);
         }
     };

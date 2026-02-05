@@ -57,7 +57,7 @@ const AdminTeamManager: React.FC<AdminTeamManagerProps> = ({ users, setUsers, cu
         }
 
         if (editingUser) {
-            setUsers(prev => prev.map(u => u.id === editingUser.id ? {
+            // setUsers(prev => prev.map(u => u.id === editingUser.id ? {
                 ...u,
                 name: formData.name.trim() || undefined,
                 username: formData.username.trim(),
@@ -77,14 +77,14 @@ const AdminTeamManager: React.FC<AdminTeamManagerProps> = ({ users, setUsers, cu
                 isActive: true,
                 permissions: jobBoardOnlyPermissions,
             };
-            setUsers(prev => [...prev, newUser]);
+            // setUsers(prev => [...prev, newUser]);
         }
         setIsFormModalOpen(false);
     };
 
     const handleDeleteUser = (userId: string) => {
         if (window.confirm('Are you sure you want to delete this team member?')) {
-            setUsers(prev => prev.filter(u => u.id !== userId));
+            // setUsers(prev => prev.filter(u => u.id !== userId));
         }
     };
 
