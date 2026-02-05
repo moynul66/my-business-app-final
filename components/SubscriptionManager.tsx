@@ -49,11 +49,9 @@ const SubscriptionManager: React.FC<SubscriptionManagerProps> = ({ currentUser, 
             };
 
             setCurrentUser(updatedUser);
-            // setUsers(prevUsers =>
-                prevUsers.map(user =>
-                    user.id === currentUser.id ? updatedUser : user
-                )
-            );
+            // Update the currently logged-in user in state
+setCurrentUser(updatedUser);
+
             alert('Subscription changed successfully! Your new features are now available.');
         }
     };
