@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InQuBu Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  @media print {
+    /* Hide everything on the page by default */
+    body * {
+      visibility: hidden;
+    }
+    /* Make the print section and everything inside it visible */
+    #print-section, #print-section * {
+      visibility: visible;
+    }
+    /* Position the print section at the top-left of the page */
+    #print-section {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+  }
+  /* Hide number input spinners */
+  .no-spinners::-webkit-outer-spin-button,
+  .no-spinners::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .no-spinners {
+    -moz-appearance: textfield;
+  }
+
+  .confetti-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .confetti-piece {
+    position: absolute;
+    width: 8px;
+    height: 16px;
+    top: -20px;
+    opacity: 0;
+    animation: fall 4s ease-in forwards;
+  }
+
+  @keyframes fall {
+    0% {
+      transform: translateY(0) rotateZ(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(200px) rotateZ(720deg);
+      opacity: 0;
+    }
+  }
+</style>
+<link rel="stylesheet" href="/index.css">
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "uuid": "https://aistudiocdn.com/uuid@^13.0.0",
+    "jspdf": "https://aistudiocdn.com/jspdf@^2.5.1",
+    "html2canvas": "https://aistudiocdn.com/html2canvas@^1.4.1"
+  }
+}
+</script>
+  <script type="module" crossorigin src="/assets/index-9J0wMS8l.js"></script>
+</head>
+  <body class="bg-slate-50">
+    <div id="root"></div>
+  </body>
+</html>
