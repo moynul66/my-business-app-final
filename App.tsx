@@ -2364,8 +2364,71 @@ const MainApp: React.FC<{
 const App: React.FC = () => {
     // Global, non-user-specific states
     const [currentUser, setCurrentUser] = useState<User | null>(null);
-const [authLoading, setAuthLoading] = useState(true);
-const users: User[] = currentUser ? [currentUser] : [];
+    const [users, setUsers] = useState<User[]>([]);
+    const [authLoading, setAuthLoading] = useState(true);
+
+    // Supabase auth: keep currentUser/users in sync with the logged-in session
+    useEffect(() => {
+        let isMounted = true;
+
+        const toAppUser = (u: any): User => {
+            const id = u.id as string;
+            const email = (u.email as string) || '';
+            const meta = (u.user_metadata || {}) as any;
+            const username = (meta.username as string) || email.split('@')[0] || 'user';
+
+            return {
+                id,
+                username,
+                email,
+                password: '', // not stored in app
+                role: 'master',
+                teamId: id,
+                subscriptionStatus: 'active',
+                isActive: true,
+                permissions: undefined as any, // some screens may set later
+            } as User;
+        };
+
+        supabase.auth.getSession().then(({ data, error }) => {
+            if (!isMounted) return;
+            if (error) {
+                console.error('getSession error', error);
+                setCurrentUser(null);
+                setUsers([]);
+                setAuthLoading(false);
+                return;
+            }
+            const session = data.session;
+            if (session?.user) {
+                const appUser = toAppUser(session.user);
+                setCurrentUser(appUser);
+                setUsers([appUser]);
+            } else {
+                setCurrentUser(null);
+                setUsers([]);
+            }
+            setAuthLoading(false);
+        });
+
+        const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+            if (!isMounted) return;
+            if (session?.user) {
+                const appUser = toAppUser(session.user);
+                setCurrentUser(appUser);
+                setUsers([appUser]);
+            } else {
+                setCurrentUser(null);
+                setUsers([]);
+                setAuthView('login');
+            }
+        });
+
+        return () => {
+            isMounted = false;
+            sub.subscription.unsubscribe();
+        };
+    }, []);
 
 
     const [subscriptionPackages, setSubscriptionPackages] = useLocalStorage<SubscriptionPackage[]>('subscription-packages', defaultSubscriptionPackages);
