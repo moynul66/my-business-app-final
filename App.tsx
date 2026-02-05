@@ -532,10 +532,6 @@ const MainApp: React.FC<{
 
     const userPackagePermissions = useMemo(() => {
         let userForSubscription = currentUser;
-        if (currentUser.role === 'team-member') {
-            const masterUser = users.find(u => u.id === currentUser.teamId);
-            userForSubscription = masterUser || currentUser;
-        }
 
         if (userForSubscription.role === 'admin' || userForSubscription.subscriptionStatus === 'lifetime_free') {
             return { allowFixedPrice: true, allowMeasuredPrice: true };
@@ -1622,10 +1618,6 @@ const MainApp: React.FC<{
 
     const hasPackagePermission = (page: PageKey) => {
         let userForSubscription = currentUser;
-        if (currentUser.role === 'team-member') {
-            const masterUser = users.find(u => u.id === currentUser.teamId);
-            userForSubscription = masterUser || currentUser;
-        }
 
         if (userForSubscription.role === 'admin' || userForSubscription.subscriptionStatus === 'lifetime_free') {
             return true;
@@ -2105,15 +2097,7 @@ const MainApp: React.FC<{
                     setPackages={setSubscriptionPackages}
                     users={users}
                 />;
-            case 'user-management':
-                return <UserManagementPage
-                    users={users}
-                    setUsers={setUsers}
-                    currentUser={currentUser}
-                    subscriptionPackages={subscriptionPackages}
-                    onOpenBulkEmail={() => setBulkEmailModalOpen(true)}
-                    onOpenUserEmail={handleOpenUserEmailModal}
-                />;
+            
             case 'reports':
                 return <ReportsPage 
                     customers={customers}
@@ -2381,6 +2365,8 @@ const App: React.FC = () => {
     // Global, non-user-specific states
     const [currentUser, setCurrentUser] = useState<User | null>(null);
 const [authLoading, setAuthLoading] = useState(true);
+const users: User[] = currentUser ? [currentUser] : [];
+
 
     const [subscriptionPackages, setSubscriptionPackages] = useLocalStorage<SubscriptionPackage[]>('subscription-packages', defaultSubscriptionPackages);
 
