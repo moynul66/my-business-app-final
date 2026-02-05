@@ -2463,19 +2463,25 @@ const users: User[] = currentUser ? [currentUser] : [];
     const [authView, setAuthView] = useState<'login' | 'register'>('login');
 
     if (!currentUser) {
-        if (authView === 'login') {
-            return <LoginPage 
-                onLogin={(user) => setCurrentUser(user)}
+    if (authView === 'login') {
+        return (
+            <LoginPage
+                onLoginSuccess={() => {
+                    // Supabase session listener will setCurrentUser()
+                }}
                 onNavigateToRegister={() => setAuthView('register')}
-                users={users}
-            />;
-        }
-       return <RegisterPage
-  onRegisterSuccess={() => setAuthView('login')}
-  onNavigateToLogin={() => setAuthView('login')}
-/>;
-
+            />
+        );
     }
+
+    return (
+        <RegisterPage
+            onRegisterSuccess={() => setAuthView('login')}
+            onNavigateToLogin={() => setAuthView('login')}
+        />
+    );
+}
+
 
     if (currentUser.subscriptionStatus === 'needs_selection') {
         return <PackageSelectionPage
