@@ -1,4 +1,5 @@
 import React, { useState, ReactNode, useEffect, useMemo } from 'react';
+import { supabase } from './lib/supabaseClient';
 // fix: Import all types from the centralized types.ts file.
 import { AppSettings, Category, Customer, InventoryItem, Invoice, InvoiceDraft, InvoiceState, QuoteDraft, Payment, Supplier, PurchaseOrder, PurchaseOrderState, Bill, BillState, User, SupplierInventoryItem, InvoiceCreationType, SubscriptionPackage, MarketplaceAccount, MarketplaceStatement, DailyTaking, TaxMode, Job, JobState, TrackedJob, PackagePermissions, PageKey, CreditNote, CreditNoteState, TaskColumn, TaskGroup, InvoiceLineItem, TrackedJobPriority, Account, ItemType, MeasurementUnit } from './types';
 import SummaryDashboard from './components/SummaryDashboard';
@@ -78,6 +79,7 @@ import { DocumentMinusIcon } from './components/icons/DocumentMinusIcon';
 import PrintableCreditNote from './components/PrintableCreditNote';
 import { BookOpenIcon } from './components/icons/BookOpenIcon';
 import { useLocalStorage } from './hooks/useLocalStorage';
+
 
 type View = 
     | 'dashboard' 
@@ -2228,7 +2230,13 @@ const MainApp: React.FC<{
                 return <div>Not found</div>;
         }
     };
-    
+   if (authLoading) {
+  return (
+    <div className="min-h-screen flex items-center justify-center text-slate-600">
+      Loading...
+    </div>
+  );
+}
     return (
         <div className="flex h-screen bg-slate-100">
             <aside className="hidden md:flex md:flex-shrink-0">
@@ -2371,8 +2379,9 @@ const MainApp: React.FC<{
 
 const App: React.FC = () => {
     // Global, non-user-specific states
-    const [users, setUsers] = useLocalStorage<User[]>('users', []);
-    const [currentUser, setCurrentUser] = useLocalStorage<User | null>('currentUser', null);
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
+const [authLoading, setAuthLoading] = useState(true);
+
     const [subscriptionPackages, setSubscriptionPackages] = useLocalStorage<SubscriptionPackage[]>('subscription-packages', defaultSubscriptionPackages);
 
     useEffect(() => {
@@ -2416,6 +2425,54 @@ const App: React.FC = () => {
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+  const loadUserFromSupabase = async () => {
+    setAuthLoading(true);
+
+    const { data } = await supabase.auth.getSession();
+    const sessionUser = data.session?.user;
+
+    if (!sessionUser) {
+      setCurrentUser(null);
+      setAuthLoading(false);
+      return;
+    }
+
+    // Try load profile from user_kv (created during Register)
+    const { data: kv } = await supabase
+      .from('user_kv')
+      .select('value')
+      .eq('user_id', sessionUser.id)
+      .eq('key', 'profile')
+      .maybeSingle();
+
+    const profile = (kv?.value ?? {}) as any;
+
+    // Build the User object your app expects
+    const user: User = {
+      id: sessionUser.id,
+      username: profile.username ?? (sessionUser.email?.split('@')[0] ?? 'user'),
+      email: sessionUser.email ?? profile.email,
+      role: profile.role ?? 'master',
+      teamId: profile.teamId ?? sessionUser.id,
+      subscriptionStatus: profile.subscriptionStatus ?? 'active',
+      isActive: profile.isActive ?? true,
+    };
+
+    setCurrentUser(user);
+    setAuthLoading(false);
+  };
+
+  loadUserFromSupabase();
+
+  const { data: sub } = supabase.auth.onAuthStateChange(() => {
+    loadUserFromSupabase();
+  });
+
+  return () => sub.subscription.unsubscribe();
+}, []);
+
 
     const [authView, setAuthView] = useState<'login' | 'register'>('login');
 
