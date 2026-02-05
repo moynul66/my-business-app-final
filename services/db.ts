@@ -1,47 +1,86 @@
 
+import { supabase, isCloudActive } from './supabase';
+
 /**
- * A mock database service that wraps localStorage.
- * This structure is designed to be easily replaced by a real database client
- * (e.g., Supabase, Firebase, or a custom API) in the future.
+ * Hybrid database service.
+ * Automatically uses Supabase if configured, otherwise falls back to localStorage.
  */
 export const db = {
     /**
-     * Loads data from the database.
-     * @param key The unique identifier for the data collection (e.g., 'user_123_inventory')
-     * @param initialValue The default value to return if no data exists
+     * Loads data from the cloud database or local storage.
      */
-    load: <T>(key: string, initialValue: T): T => {
+    load: async <T>(key: string, initialValue: T): Promise<T> => {
         try {
-            const item = window.localStorage.getItem(key);
-            return item ? JSON.parse(item) : initialValue;
+            if (isCloudActive && supabase) {
+                const { data, error } = await supabase
+                    .from('user_persistence')
+                    .select('value')
+                    .eq('key', key)
+                    .single();
+
+                if (!error && data) {
+                    return data.value as T;
+                }
+                
+                // If cloud load fails but we have local data, migrate it
+                const localItem = window.localStorage.getItem(key);
+                if (localItem) {
+                    const parsed = JSON.parse(localItem);
+                    await db.save(key, parsed);
+                    return parsed;
+                }
+            } else {
+                // Fallback to local storage if cloud is not configured
+                const localItem = window.localStorage.getItem(key);
+                return localItem ? JSON.parse(localItem) : initialValue;
+            }
+            
+            return initialValue;
         } catch (error) {
-            console.error(`Error loading from DB [${key}]:`, error);
+            console.warn(`Load failed for [${key}], returning initial value.`, error);
             return initialValue;
         }
     },
 
     /**
-     * Saves data to the database.
-     * @param key The unique identifier for the data collection
-     * @param value The data to save
+     * Saves data to the cloud database or local storage.
      */
-    save: <T>(key: string, value: T): void => {
+    save: async <T>(key: string, value: T): Promise<void> => {
         try {
+            // Always save to local storage for speed and offline availability
             window.localStorage.setItem(key, JSON.stringify(value));
+
+            if (isCloudActive && supabase) {
+                const { error } = await supabase
+                    .from('user_persistence')
+                    .upsert({ 
+                        key, 
+                        value, 
+                        updated_at: new Date().toISOString() 
+                    }, { onConflict: 'key' });
+
+                if (error) console.error("Cloud sync error:", error);
+            }
         } catch (error) {
-            console.error(`Error saving to DB [${key}]:`, error);
+            console.error(`Save failed for [${key}]:`, error);
         }
     },
     
     /**
-     * Removes data from the database.
-     * @param key The unique identifier for the data collection
+     * Removes data from both the cloud and local storage.
      */
-    remove: (key: string): void => {
+    remove: async (key: string): Promise<void> => {
         try {
             window.localStorage.removeItem(key);
+
+            if (isCloudActive && supabase) {
+                await supabase
+                    .from('user_persistence')
+                    .delete()
+                    .eq('key', key);
+            }
         } catch (error) {
-            console.error(`Error removing from DB [${key}]:`, error);
+            console.error(`Remove failed for [${key}]:`, error);
         }
     }
 };
