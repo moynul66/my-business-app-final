@@ -56,30 +56,12 @@ const AdminTeamManager: React.FC<AdminTeamManagerProps> = ({ users, setUsers, cu
             alert('Password must be at least 6 characters long.'); return;
         }
 
-        if (editingUser) {
-            // setUsers(prev => prev.map(u => u.id === editingUser.id ? {
-                ...u,
-                name: formData.name.trim() || undefined,
-                username: formData.username.trim(),
-                email: formData.email.trim(),
-                password: formData.password ? formData.password : u.password,
-            } : u));
-        } else {
-            const newUser: User = {
-                id: crypto.randomUUID(),
-                name: formData.name.trim() || undefined,
-                username: formData.username.trim(),
-                email: formData.email.trim(),
-                password: formData.password,
-                role: 'team-member',
-                teamId: currentUser.id,
-                subscriptionStatus: 'inherited',
-                isActive: true,
-                permissions: jobBoardOnlyPermissions,
-            };
-            // setUsers(prev => [...prev, newUser]);
-        }
-        setIsFormModalOpen(false);
+       // Team member add/edit is temporarily disabled while migrating to Supabase.
+// This prevents build errors from leftover localStorage user logic.
+alert("Team management is temporarily disabled while we migrate to Supabase.");
+setIsFormModalOpen(false);
+return;
+
     };
 
     const handleDeleteUser = (userId: string) => {
