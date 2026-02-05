@@ -8,11 +8,8 @@ interface RegisterPageProps {
   onNavigateToLogin: () => void;
 }
 
-const RegisterPage: React.FC<RegisterPageProps> = ({
-  onRegisterSuccess,
-  onNavigateToLogin,
-}) => {
-  const [username, setUsername] = useState(''); // optional (not saved yet)
+const RegisterPage: React.FC<RegisterPageProps> = ({ onRegisterSuccess, onNavigateToLogin }) => {
+  const [username, setUsername] = useState(''); // optional
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -38,12 +35,11 @@ const RegisterPage: React.FC<RegisterPageProps> = ({
 
     setLoading(true);
 
-    // Create account in Supabase Auth
     const { error: signUpError } = await supabase.auth.signUp({
       email: email.trim(),
       password,
       options: {
-        // This stores username as metadata (optional)
+        // optional: keep username in user metadata (does not affect login)
         data: { username: username.trim() || undefined },
       },
     });
@@ -51,11 +47,18 @@ const RegisterPage: React.FC<RegisterPageProps> = ({
     setLoading(false);
 
     if (signUpError) {
+      const msg = (signUpError.message || '').toLowerCase();
+
+      if (msg.includes('rate limit') || msg.includes('too many')) {
+        setError('Email rate limit exceeded. Please wait 10 minutes and try again.');
+        return;
+      }
+
       setError(signUpError.message);
       return;
     }
 
-    alert('Registration successful! Please log in to choose your plan and start your free trial.');
+    alert('Registration successful! Please log in.');
     onRegisterSuccess();
   };
 
@@ -64,9 +67,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-slate-900">Create an Account</h1>
-          <p className="mt-2 text-sm text-slate-500">
-            Join InQuBu Pro to manage your business
-          </p>
+          <p className="mt-2 text-sm text-slate-500">Join InQuBu Pro to manage your business</p>
         </div>
 
         <form onSubmit={handleRegister} className="space-y-6">
@@ -80,6 +81,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="mt-1"
+              autoComplete="username"
             />
           </div>
 
@@ -94,6 +96,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({
               onChange={(e) => setEmail(e.target.value)}
               required
               className="mt-1"
+              autoComplete="email"
             />
           </div>
 
@@ -108,6 +111,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({
               onChange={(e) => setPassword(e.target.value)}
               required
               className="mt-1"
+              autoComplete="new-password"
             />
           </div>
 
@@ -122,16 +126,15 @@ const RegisterPage: React.FC<RegisterPageProps> = ({
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               className="mt-1"
+              autoComplete="new-password"
             />
           </div>
 
           {error && <p className="text-sm text-red-600 text-center">{error}</p>}
 
-          <div>
-            <Button type="submit" variant="primary" className="w-full" disabled={loading}>
-              {loading ? 'Creating...' : 'Register'}
-            </Button>
-          </div>
+          <Button type="submit" variant="primary" className="w-full" disabled={loading}>
+            {loading ? 'Creating account...' : 'Register'}
+          </Button>
         </form>
 
         <div className="text-center text-sm">

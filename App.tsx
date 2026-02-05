@@ -2528,12 +2528,11 @@ const App: React.FC = () => {
     if (!currentUser) {
     if (authView === 'login') {
         return (
-            <LoginPage
-                onLoginSuccess={() => {
-                    // Supabase session listener will setCurrentUser()
-                }}
-                onNavigateToRegister={() => setAuthView('register')}
-            />
+           <LoginPage
+  onLoginSuccess={() => setAuthLoading(false)} // or your “go to app” logic
+  onNavigateToRegister={() => setAuthView('register')}
+/>
+
         );
     }
 
