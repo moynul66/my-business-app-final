@@ -1,0 +1,5 @@
+{
+  "name": "Inqubu Pro Ver 4.3 04.02.2026 (same as Updated 4.2)",
+  "description": "An intuitive inventory and invoice management application that supports both fixed-price items and items priced by measurement units (e.g., per square meter). Easily create detailed invoices with automatic price calculations based on dimensions and unit conversions.",
+  "requestFramePermissions": []
+}
