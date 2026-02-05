@@ -2362,6 +2362,7 @@ const MainApp: React.FC<{
 };
 
 const App: React.FC = () => {
+  const [authLoading, setAuthLoading] = useState(false);
     // Global, non-user-specific states
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [users, setUsers] = useState<User[]>([]);
